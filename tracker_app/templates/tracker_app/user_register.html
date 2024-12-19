@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load tailwind_filters %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+{% if form.erors %}
+{% for error in forms.errors %}
+{{error}}
+{% endfor %}
+{% endif %}
+
+
+<form action="" method="POST">
+  {% csrf_token %}
+  {{ form.as_p|crispy }}
+  <input type="submit" value="Submit">
+</form>
+
+{% endblock %}
