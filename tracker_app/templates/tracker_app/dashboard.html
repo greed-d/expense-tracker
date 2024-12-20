@@ -1,5 +1,19 @@
 {% extends "base.html" %}
-{% load static tailwind_tags %}
 {% block content %}
-<h1 class="text-4xl">Welcome to the Dashboard</h1>
+<h1>Welcome to the Dashboard</h1>
+
+  <!-- { % if expense_info_all %} -->
+<ul>
+  {% for data in expense_info_all %}
+    <h2>Welcome {{ data.user }}</h2>
+    <li> Your amount : {{ data.amount }}</li>
+    <li> Your source : {{ data.source }}</li>
+    <li>  Spent at : {{ data.time }}</li>
+  {% endfor %}
+</ul>
+  <!-- { % else %} -->
+    <!-- <h3>No data to show</h3> -->
+  <!-- { % endif %} -->
+
+
 {% endblock %}
