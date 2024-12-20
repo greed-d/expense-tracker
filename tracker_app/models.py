@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 
 INCOME_CHOICES = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
-INCOME_REASON = []
+INCOME_REASON = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
 
 EXPENSE_CHOICES = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
 EXPENSE_REASON = [
@@ -36,3 +36,11 @@ class ExpenseTracker(models.Model):
 
     def __str__(self):
         return self.reason
+
+
+class ExpenseCategory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class IncomeCategory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
