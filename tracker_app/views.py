@@ -53,9 +53,6 @@ class UserLoginStuff(FormView):
             form.add_error(None, "Invalid Credentials")
             return self.form_invalid(form)
 
-    # def get_success_url(self):
-    #     return reverse_lazy("home")
-
 
 class UserDashboardView(LoginRequiredMixin, ListView):
     model = ExpenseTracker

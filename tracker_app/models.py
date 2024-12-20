@@ -3,10 +3,10 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-INCOME_CHOICES = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
+INCOME_AT = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
 INCOME_REASON = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
 
-EXPENSE_CHOICES = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
+EXPENSE_FROM = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
 EXPENSE_REASON = [
     ("Bank", "Bank-reason"),
     ("Wallet", "Wallet-reason"),
@@ -15,7 +15,7 @@ EXPENSE_REASON = [
 
 
 class IncomeTracker(models.Model):
-    source = models.CharField(max_length=50, choices=INCOME_CHOICES)
+    source = models.CharField(max_length=50, choices=INCOME_AT)
     amount = models.FloatField()
     reason = models.CharField(max_length=50, choices=INCOME_REASON)
     remarks = models.TextField()
@@ -27,7 +27,7 @@ class IncomeTracker(models.Model):
 
 
 class ExpenseTracker(models.Model):
-    source = models.CharField(max_length=50, choices=EXPENSE_CHOICES)
+    source = models.CharField(max_length=50, choices=EXPENSE_FROM)
     amount = models.FloatField()
     reason = models.CharField(max_length=50, choices=EXPENSE_REASON)
     remarks = models.TextField()
@@ -40,6 +40,7 @@ class ExpenseTracker(models.Model):
 
 class ExpenseCategory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=15)
 
 
 class IncomeCategory(models.Model):
