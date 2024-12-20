@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load tailwind_filters %}
+{% block title %}Tracker Login{% endblock %}
+
+{% block content %}
+
+<form action="" method="POST">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <input type="submit" value="Submit">
+</form>
+
+{% if form.errors %}
+
+<div>
+  <p><strong>Invalid Username or password</strong></p>
+</div>
+
+{% endif %}
+
+{% endblock %}
