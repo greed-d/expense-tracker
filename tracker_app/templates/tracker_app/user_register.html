@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load tailwind_filters %}
 {% block title %}Login{% endblock %}
-
 {% block content %}
+<div class="w-full max-w-2xl mx-auto sm:px-6 lg:px-8">
+<h1 class="text-4xl font-bold mt-16 mb-5">Register User</h1>
 {% if form.erors %}
 {% for error in forms.errors %}
 {{ error }}
@@ -13,7 +14,8 @@
 <form action="" method="POST">
   {% csrf_token %}
   {{ form|crispy }}
-  <input type="submit" value="Submit">
+<button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit">Submit</button>
 </form>
+</div>
 
 {% endblock %}
