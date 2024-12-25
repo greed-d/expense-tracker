@@ -1,20 +1,43 @@
 {% extends "base.html" %}
+{% load tailwind_filters %}
 {% block content %}
 {% include "navbar.html" %}
-<h1 class="text-4xl font-bold m-8">Welcome to the Dashboard</h1>
 
-  <!-- { % if expense_info_all %} -->
-<ul>
-  {% for data in expense_info_all %}
-    <h2 class="text-2xl mb-4 ml-8">Welcome <strong>{{ data.user }}</strong></h2>
-    <li> Your amount : {{ data.amount }}</li>
-    <li> Your source : {{ data.source }}</li>
-    <li>  Spent at : {{ data.time }}</li>
-  {% endfor %}
-</ul>
-  <!-- { % else %} -->
-    <!-- <h3>No data to show</h3> -->
-  <!-- { % endif %} -->
+<div class="flow-root">
+
+  <h1 class="text-4xl font-bold m-8">Welcome to the Dashboard</h1>
+  <div class="float-left">
+
+    <p><strong>Hello</strong></p>
 
 
+  </div>
+
+  <div class="flow-right">
+
+    <ul class="text-2x mb-4 ml-8">
+      <li>
+        Current Balance : {{ current_balance }}
+      </li>
+      <li>
+        Total Income : {{ total_income }}
+      </li>
+      <li>
+        Total Expense : {{ total_expense }}
+      </li>
+    </ul>
+
+    <div class="w-full max-w-2xl mx-8">
+
+      <form action="" method="POST" id="amount_input_form">
+
+        {% csrf_token %}
+        <label for="amount">Amount : </label>
+        {{ form|crispy }}
+        <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit">Submit</button>
+
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
