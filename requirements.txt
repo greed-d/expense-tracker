@@ -1,7 +1,7 @@
 asgiref==3.8.1
+crispy-tailwind==1.0.3
 Django==5.1.4
-django-stubs==5.1.1
-django-stubs-ext==5.1.1
+django-browser-reload==1.17.0
+django-crispy-forms==2.3
+django-tailwind==3.8.0
 sqlparse==0.5.3
-types-PyYAML==6.0.12.20240917
-typing_extensions==4.12.2
