@@ -37,12 +37,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # "tailwind",
-    # "theme",
+    "tracker_app.apps.TrackerAppConfig",
+    "tailwind",
+    "tracker_theme",
     "crispy_forms",
     "crispy_tailwind",
-    # "django_browser_reload",
-    "tracker_app.apps.TrackerAppConfig",
+    "django_browser_reload",
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
@@ -50,9 +50,9 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 
 LOGOUT_REDIRECT_URL = "login"
 
-# TAILWIND_APP_NAME = "theme"
+TAILWIND_APP_NAME = "tracker_theme"
 #
-# INTERNAL_IPS = ["127.0.0.1"]
+INTERNAL_IPS = ["127.0.0.1"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -62,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "django_browser_reload.middleware.BrowserReloadMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = "tracker_project.urls"
