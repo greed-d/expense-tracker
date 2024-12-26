@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from tracker_app.models import IncomeTracker, ExpenseTracker
 
 
 class UserRegsiterForm(UserCreationForm):
@@ -37,6 +36,11 @@ class InputOrExpense(forms.Form):
         widget=forms.Select,
         required=True
     )
+    # category = forms.ModelChoiceField(
+    #     queryset=ExpenseCategory.objects.none(),
+    #     required=True,
+    #     empty_label="Select Category",
+    # )
     reason = forms.CharField(
         max_length=200, 
         required=True
@@ -46,15 +50,9 @@ class InputOrExpense(forms.Form):
         required=False
     )
 
-
-
-class IncomeInputForm(forms.ModelForm):
-    class Meta:
-        model = IncomeTracker
-        fields = ["amount", "source", "reason", "remarks"]
-
-
-class ExpenseInputForm(forms.ModelForm):
-    class Meta:
-        model = ExpenseTracker
-        fields = ["amount", "source", "reason", "remarks"]
+class SourceFilterForm(forms.Form):
+    source = forms.ChoiceField(
+        choices=(("CA", "Cash"), ("BA", "Bank"), ("WA", "Wallet")),
+        widget=forms.Select,
+        required=True
+    )
