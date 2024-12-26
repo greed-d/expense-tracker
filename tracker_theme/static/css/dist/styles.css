@@ -881,6 +881,10 @@ select {
   z-index: 50;
 }
 
+.float-right {
+  float: right;
+}
+
 .float-left {
   float: left;
 }
@@ -939,10 +943,6 @@ select {
 
 .ml-10 {
   margin-left: 2.5rem;
-}
-
-.ml-8 {
-  margin-left: 2rem;
 }
 
 .mr-3 {
@@ -1132,6 +1132,10 @@ select {
 
 .justify-between {
   justify-content: space-between;
+}
+
+.justify-around {
+  justify-content: space-around;
 }
 
 .gap-x-6 {
