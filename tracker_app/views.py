@@ -8,7 +8,7 @@ from django.db import models
 
 from tracker_app.models import ExpenseTracker, IncomeTracker
 
-from .forms import InputOrExpense, UserLoginForm, UserRegsiterForm
+from .forms import InputOrExpense, SourceFilterForm, UserLoginForm, UserRegsiterForm
 
 
 class UserRegisterView(FormView):
@@ -54,29 +54,54 @@ class UserDashboardView(LoginRequiredMixin, View):
     # success_url = reverse_lazy("home")
 
     def get(self, request):
-        # expense_info_all = ExpenseTracker.objects.filter(user=self.request.user)
-        # income_input_view = IncomeTracker.objects.filter(user=self.request.user)
+        total_income = IncomeTracker.objects.filter(user=request.user).aggregate(models.Sum("amount"))["amount__sum"] or 0
+        total_expense = ExpenseTracker.objects.filter(user=request.user).aggregate(models.Sum("amount"))["amount__sum"] or 0
 
-        TOTAL_INCOME = IncomeTracker.objects.filter(user=request.user).aggregate(models.Sum("amount"))["amount__sum"] or 0
-        TOTAL_EXPENSE = ExpenseTracker.objects.filter(user=request.user).aggregate(models.Sum("amount"))["amount__sum"] or 0
 
-        EXPENSE_SOURCE = (
+        expense_category = (
+        ExpenseTracker.objects.filter(user=request.user)
+            .values("category__name")
+            .annotate(Total_amount=models.Sum("amount"))
+        )
+
+        expense_source = (
             ExpenseTracker.objects.filter(user=request.user)
             .values("source")
             .annotate(total_sum=models.Sum("amount"))
         )
 
-        current_balance = TOTAL_INCOME - TOTAL_EXPENSE
+        current_balance = total_income - total_expense
 
-        print(f"TOTAL_INCOME: {TOTAL_INCOME}")
-        print(f"TOTAL_EXPENSE: {TOTAL_EXPENSE}")
+        # Get form for filtering 
+        filter_form = SourceFilterForm(request.GET)
+
+        filtered_source = expense_source
+        if filter_form.is_valid() and filter_form.cleaned_data["source"]:
+            selected_source = filter_form.cleaned_data["source"]
+            filtered_source = [item for item in expense_source if item["source"] == selected_source]
+
+
+
+        #Debug Expressions
+        print()
+        print("------------------------------------")
+        print(f"TOTAL_INCOME: {total_income}")
+        print(f"TOTAL_EXPENSE: {total_expense}")
+        print(f"TOTAL_EXPENSE: {expense_source}")
         print(f"CURRENT_BALANCE: {current_balance}")
+        print(f"EXPENSE_CATEGORY : {expense_category}")
+        # print(f"SOURCE : {self.form_class(request.POST).cleaned_data['source']}")
+        print("------------------------------------")
+        print()
 
         context = {
             "current_balance" : current_balance,
-            "total_income": TOTAL_INCOME,
-            "total_expense": TOTAL_EXPENSE,
-            "expense_total" : EXPENSE_SOURCE,
+            "total_income": total_income,
+            "total_expense": total_expense,
+            "expense_total" : expense_source,
+            "filtered_source": filtered_source,
+            "filter_form": filter_form,
+            # "expense_category" : expense_category,
             "form": InputOrExpense(),
         }
 
@@ -101,10 +126,12 @@ class UserDashboardView(LoginRequiredMixin, View):
                 )
 
             elif input_type == "EX":
+                # category = form.cleaned_data["category"]
                 ExpenseTracker.objects.create(
                     user = self.request.user,
                     amount = amount,
                     source = source,
+                    # category = category,
                     reason = reason,
                     remarks = remarks,
                 )
@@ -176,3 +203,4 @@ class UserDashboardView(LoginRequiredMixin, View):
 
 class HeroSectionView(TemplateView):
     template_name = "tracker_app/hero_section.html"
+
