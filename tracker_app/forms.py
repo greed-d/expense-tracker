@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
-
 class UserRegsiterForm(UserCreationForm):
     class Meta:
         model = User
@@ -36,11 +35,11 @@ class InputOrExpense(forms.Form):
         widget=forms.Select,
         required=True
     )
-    # category = forms.ModelChoiceField(
-    #     queryset=ExpenseCategory.objects.none(),
-    #     required=True,
-    #     empty_label="Select Category",
-    # )
+    category = forms.ModelChoiceField(
+        # queryset=ExpenseCategory.objects.filter(),
+        required=True,
+        empty_label="Select Category",
+    )
     reason = forms.CharField(
         max_length=200, 
         required=True
@@ -51,8 +50,13 @@ class InputOrExpense(forms.Form):
     )
 
 class SourceFilterForm(forms.Form):
+    type = forms.ChoiceField(
+        choices=(("IN", "Income"), ("EX", "Expense")),
+        widget=forms.Select,
+        # required=True
+    )
     source = forms.ChoiceField(
         choices=(("CA", "Cash"), ("BA", "Bank"), ("WA", "Wallet")),
         widget=forms.Select,
-        required=True
+        # required=True
     )

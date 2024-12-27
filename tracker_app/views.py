@@ -69,18 +69,41 @@ class UserDashboardView(LoginRequiredMixin, View):
             .values("source")
             .annotate(total_sum=models.Sum("amount"))
         )
+        #
+        income_source = (
+            IncomeTracker.objects.filter(user=request.user)
+            .values("source")
+            .annotate(total_sum=models.Sum("amount"))
+        )
+
 
         current_balance = total_income - total_expense
+
+        filter_result = None
 
         # Get form for filtering 
         filter_form = SourceFilterForm(request.GET)
 
-        filtered_source = expense_source
-        if filter_form.is_valid() and filter_form.cleaned_data["source"]:
-            selected_source = filter_form.cleaned_data["source"]
-            filtered_source = [item for item in expense_source if item["source"] == selected_source]
+        if filter_form.is_valid():
+            search_type = filter_form.cleaned_data["type"]
 
+            if search_type == "IN":
+                selected_source = filter_form.cleaned_data["source"]
+                filter_result = IncomeTracker.objects.filter(user=request.user, source=selected_source).values_list("amount", flat=True)
 
+            elif search_type == "EX":
+                selected_source = filter_form.cleaned_data["source"]
+                filter_result = ExpenseTracker.objects.filter(user=request.user, source=selected_source).values_list("amount", flat=True)
+
+            income_qs = IncomeTracker.objects.all()
+            print(income_qs)
+            
+        else:
+            print()
+            print("------------------------------------")
+            print("Doomed")
+            print("------------------------------------")
+            print()
 
         #Debug Expressions
         print()
@@ -99,7 +122,7 @@ class UserDashboardView(LoginRequiredMixin, View):
             "total_income": total_income,
             "total_expense": total_expense,
             "expense_total" : expense_source,
-            "filtered_source": filtered_source,
+            "filter_result": filter_result,
             "filter_form": filter_form,
             # "expense_category" : expense_category,
             "form": InputOrExpense(),
@@ -136,69 +159,6 @@ class UserDashboardView(LoginRequiredMixin, View):
                     remarks = remarks,
                 )
         return redirect("home")
-
-    # def post(self, request):
-    #     income_form = IncomeInputForm(request.POST)
-    #     expense_form = ExpenseInputForm(request.POST)
-    #
-    #     selected_option = request.POST["form_selector"]
-    #     print(f"User selected : {selected_option}")
-    #
-    #     if selected_option == "income":
-    #         income = income_form.save(commit=False)
-    #         income.user = request.user
-    #         income.save()
-    #         return redirect("home")
-    #
-    #     elif selected_option == "expense":
-    #         expense = expense_form.save(commit=False)
-    #         expense.user = request.user
-    #         expense.save()
-    #         return redirect("home")
-            
-
-        # if income_form.is_valid():
-        #     income = income_form.save(commit=False)
-        #     income.user = request.user
-        #     income.save()
-        #
-        #     return redirect("home")
-        # elif expense_form.is_valid():
-        #     expense = expense_form.save(commit=False)
-        #     expense.user = request.user
-        #     expense.save()
-        #
-        #     return redirect("home")
-        #
-        #
-        # 
-
-        # TOTAL_INCOME = IncomeTracker.objects.filter(user=request.user).aggregate(models.Sum("amount"))["amount__sum"] or 0
-        # TOTAL_EXPENSE = ExpenseTracker.objects.filter(user=request.user).aggregate(models.Sum("amount"))["amount__sum"] or 0
-        #
-        # current_balance = TOTAL_INCOME - TOTAL_EXPENSE
-        #
-        # context = {
-        #     "current_balance" : current_balance,
-        #     "total_income": TOTAL_INCOME,
-        #     "total_expense": TOTAL_EXPENSE,
-        #     "income_form": IncomeInputForm(),
-        #     "expense_form": ExpenseInputForm()
-        # }
-        #
-        # return render(request, self.template_name, context)
-
-
-
-
-# class IncomeInputView(ListView):
-#     model = IncomeTracker
-#     template_name = "tracker_app/dashboard.html"
-#     context_object_name = "income_input_view"
-#
-#     def get_queryset(self):
-#         queryset = super().get_queryset()
-#         return queryset.filter(user=self.request.user)
 
 
 class HeroSectionView(TemplateView):
