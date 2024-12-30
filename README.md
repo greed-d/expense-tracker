@@ -6,7 +6,9 @@
 - [x] Different modes for income and expense ( Wallet, Cash, Bank )
 - [ ] Cleaner Dashboard View
 - [ ] User Entry for expense categories
-- [ ] Display Expense accourding to source in User Dashboard
+- [x] Display Expense accourding to source in User Dashboard
+- [ ] Filter transactions according to date
+- [ ] Show column view for recent transactions
 
 ## Motivation :
 - To learn how models and relation works with authentication and per user categories using `user_id`
