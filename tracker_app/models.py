@@ -7,7 +7,7 @@ INCOME_REASON = []
 EXPENSE_FROM = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
 
 class ExpenseCategory(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE )
+    user = models.ForeignKey(User,blank=True, null=True, on_delete=models.CASCADE )
     name = models.CharField(max_length=20)
 
     def __str__(self):

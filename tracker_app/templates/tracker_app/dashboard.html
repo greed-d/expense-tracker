@@ -5,7 +5,7 @@
 
 <div class="flex flex-col justify-center items-center">
 
-  <h1 class="text-4xl font-bold m-8">Welcome to the Dashboard, {{ user }}</h1>
+  <h1 class="text-4xl font-bold m-8">Welcome to the Dashboard</h1>
 
   <div class="flex items-center justify-around w-full">
     <div class="float-left">
@@ -17,11 +17,10 @@
 
       <h2>Filtered Expenses</h2>
       <ul>
-        Filter Result = 
-        {% for amount in filter_result %}
-
-          {{ amount }},
-
+        {% for item in filtered_source %}
+          <li>{{ item.source }}: {{ item.total_sum }}</li>
+        {% empty %}
+          <li>No data available for the selected source.</li>
         {% endfor %}
       </ul>
       <p><strong>Hello</strong></p>
@@ -35,9 +34,6 @@
         </li>
         <li>
           Total Sources : {{ expense_source }}
-        </li>
-        <li>
-          Total Expense : {{ total_expense }}
         </li>
         <li>
           Total Expense : {{ total_expense }}
