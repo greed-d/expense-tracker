@@ -3,22 +3,29 @@
 {% block content %}
 {% include "navbar.html" %}
 
+{% if form.errors %}
+    {% for error in form.errors %}
+      {{ error }}
+    {% endfor %}
+{% endif %}
+
 <div class="flex flex-col justify-center items-center">
 
-  <h1 class="text-4xl font-bold m-8">Welcome to the Dashboard</h1>
+  <h1 class="text-4xl font-bold m-8">Welcome to the Dashboard, {{ user.username }}</h1>
 
   <div class="flex items-center justify-around w-full">
     <div class="float-left">
 
-      <form method="get">
+      <form method="POST">
+        {% csrf_token %}
         {{ filter_form|crispy }}
-        <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit">Submit</button>
+        <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" name="filter_submit" type="submit">Submit</button>
       </form>
 
       <h2>Filtered Expenses</h2>
       <ul>
-        {% for item in filtered_source %}
-          <li>{{ item.source }}: {{ item.total_sum }}</li>
+        {% for amount in filter_result %}
+          <li>{{ amount }}: {{ item.total_sum }}</li>
         {% empty %}
           <li>No data available for the selected source.</li>
         {% endfor %}
@@ -59,9 +66,9 @@
         <form action="" method="POST" id="amount_input_form">
 
           {% csrf_token %}
-          <label for="amount">Amount : </label>
           {{ form|crispy }}
-          <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="submit">Submit</button>
+
+          <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" name="tracker_submit" type="submit">Submit</button>
 
         </form>
       </div>
