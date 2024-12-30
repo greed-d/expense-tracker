@@ -25,7 +25,7 @@
       <h2>Filtered Expenses</h2>
       <ul>
         {% for amount in filter_result %}
-          <li>{{ amount }}: {{ item.total_sum }}</li>
+          <li>{{ amount }}</li>
         {% empty %}
           <li>No data available for the selected source.</li>
         {% endfor %}
