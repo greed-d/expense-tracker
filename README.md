@@ -5,7 +5,7 @@
 - [x] Add Income and expenses
 - [x] Different modes for income and expense ( Wallet, Cash, Bank )
 - [ ] Cleaner Dashboard View
-- [ ] User Entry for expense categories
+- [x] User Entry for expense categories
 - [x] Display Expense accourding to source in User Dashboard
 - [ ] Filter transactions according to date
 - [ ] Show column view for recent transactions
