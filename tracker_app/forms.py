@@ -20,6 +20,11 @@ class UserLoginForm(forms.Form):
     username = forms.CharField(required=True, max_length=20)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
 
+class AddCategory(forms.ModelForm):
+    class Meta:
+        model = ExpenseCategory
+        fields = ["name"]
+
 class InputOrExpense(forms.Form):
     input_type = forms.ChoiceField(
         choices=(("IN", "Income"), ("EX", "Expense")),
@@ -40,8 +45,8 @@ class InputOrExpense(forms.Form):
     category = forms.ModelChoiceField(
         queryset = ExpenseCategory.objects.all(),
         widget = forms.Select,
-        # required=True,
-        # empty_label="Select Category",
+        required=True,
+        empty_label="Select Category",
     )
     time = forms.DateTimeField(
         label = "When?",
@@ -53,7 +58,10 @@ class InputOrExpense(forms.Form):
         required=True
     )
     remarks = forms.CharField(
-        widget=forms.Textarea(attrs={"placeholder": "Enter remarks (optional)"} ), 
+        widget=forms.Textarea(attrs={
+            "placeholder": "Enter remarks (optional)",
+            "rows": 2  
+        }),
         required=False
     )
 
