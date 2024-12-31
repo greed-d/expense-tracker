@@ -25,6 +25,28 @@ class AddCategory(forms.ModelForm):
         model = ExpenseCategory
         fields = ["name"]
 
+class DateFilterForm(forms.Form):
+    start_date = forms.DateTimeField(
+        label = "From",
+        widget = forms.DateTimeInput(attrs={'type' : 'datetime-local'}),
+        input_formats = ["%Y-%m-%d"]
+    )
+    end_date = forms.DateTimeField(
+        label = "To",
+        widget = forms.DateTimeInput(attrs={'type' : 'datetime-local'}),
+        input_formats = ["%Y-%m-%d"]
+    )
+    source = forms.ChoiceField(
+        choices=(("CA", "Cash"), ("BA", "Bank"), ("WA", "Wallet")),
+        widget=forms.Select,
+        required=True
+    )
+    input_type = forms.ChoiceField(
+        choices=(("IN", "Income"), ("EX", "Expense")),
+        widget=forms.Select,
+        required=True
+    )
+
 class InputOrExpense(forms.Form):
     input_type = forms.ChoiceField(
         choices=(("IN", "Income"), ("EX", "Expense")),

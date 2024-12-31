@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load tailwind_filters %}
+
+{% block content %}
+{% include "navbar.html" %}
+
+<form action="" method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Submit</button>
+</form>
+
+{% if results is not None %}
+<h3>Results : </h3>
+{% if results %}
+<ul>
+  {% for result in results %}
+  <li>{{ result.time }} - {{ result.amount }} - {{ result.source }}</li>
+  {% endfor %}
+</ul>
+{% else %}
+No results found
+{% endif %}
+{% endif %}
+
+
+{% endblock %}
