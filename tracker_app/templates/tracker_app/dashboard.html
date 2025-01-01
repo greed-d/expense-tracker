@@ -27,6 +27,7 @@
       <hr>
 
       <form method="POST">
+
         {% csrf_token %}
         {{ filter_form|crispy }}
         <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" name="filter_submit" type="submit">Submit</button>
@@ -78,7 +79,34 @@
             {% endfor %}
         </tbody>
     </table>
-</div>
+      <h3>Recent Transactions</h3>
+      <table>
+          <thead>
+              <tr>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Source</th>
+                  <th>Category</th>
+                  <th>Reason</th>
+                  <th>Remarks</th>
+                  <th>Time</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for transaction in recent_transactions %}
+              <tr>
+                <td>{{ transaction.transaction_type }}</td>
+                <td>{{ transaction.amount }}</td>
+                <td>{{ transaction.source }}</td>
+                <td>{{ transaction.category__name|default:"N/A" }}</td>
+                <td>{{ transaction.reason }}</td>
+                <td>{{ transaction.remarks }}</td>
+                <td>{{ transaction.time }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+      </div>
         <!-- { { filter_result }} -->
       </div>
 

@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.shortcuts import redirect, render
 from django.views.generic.base import View
+from itertools import chain
 
 from tracker_app.forms import InputOrExpense, SourceFilterForm
 from tracker_app.models import ExpenseTracker, IncomeTracker
@@ -18,12 +19,27 @@ class UserDashboardView(LoginRequiredMixin, View):
 
         current_balance = total_income - total_expense
 
+        income_transactions = IncomeTracker.objects.filter(user=user).values(
+            'amount', 'source', 'reason', 'category__name', 'remarks', 'time'
+        ).annotate(transaction_type=models.Value('Income', output_field=models.CharField()))
+
+        expense_transactions = ExpenseTracker.objects.filter(user=user).values(
+            'amount', 'source', 'reason', 'category__name', 'remarks', 'time'
+        ).annotate(transaction_type=models.Value('Expense', output_field=models.CharField()))
+
+        # Combine and sort by time
+        recent_transactions = sorted(
+            chain(income_transactions, expense_transactions),
+            key=lambda x: x['time'],  # Use dictionary keys
+            reverse=True
+        )[:5]  # Limit to last 5 transactions
+
         return {
             "current_balance" : current_balance,
             "total_income" : total_income,
             "total_expense" : total_expense,
+            "recent_transactions" : recent_transactions
         }
-
 
     def get(self, request):
         context_data = self.get_data(request.user)
@@ -128,5 +144,4 @@ class UserDashboardView(LoginRequiredMixin, View):
         }
 
         return render(request, self.template_name, context=context)
-
 
