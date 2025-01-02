@@ -1,6 +1,8 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import FormView
+from django.views.generic.base import View
 
 from tracker_app.forms import UserLoginForm, UserRegsiterForm
 
@@ -40,4 +42,10 @@ class UserLoginView(FormView):
         else:
             form.add_error(None, "Invalid Credentials")
             return self.form_invalid(form)
+
+class UserLogoutView(View):
+    def get(self, request):
+        logout(request)
+
+        return redirect('login')
 
