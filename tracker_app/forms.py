@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 from tracker_app.models import ExpenseCategory
 
 
@@ -28,12 +29,12 @@ class AddCategory(forms.ModelForm):
 class DateFilterForm(forms.Form):
     start_date = forms.DateTimeField(
         label = "From",
-        widget = forms.DateTimeInput(attrs={'type' : 'datetime-local'}),
+        widget = forms.DateTimeInput(attrs={'type' : 'date'}),
         input_formats = ["%Y-%m-%d"]
     )
     end_date = forms.DateTimeField(
         label = "To",
-        widget = forms.DateTimeInput(attrs={'type' : 'datetime-local'}),
+        widget = forms.DateTimeInput(attrs={'type' : 'date'}),
         input_formats = ["%Y-%m-%d"]
     )
     source = forms.ChoiceField(
@@ -46,6 +47,15 @@ class DateFilterForm(forms.Form):
         widget=forms.Select,
         required=True
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data["start_date"]
+        end_date = cleaned_data["end_date"]
+
+        if start_date and end_date:
+            if start_date > end_date:
+                raise ValidationError("Start date cannot be after end date")
 
 class InputOrExpense(forms.Form):
     input_type = forms.ChoiceField(
