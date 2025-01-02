@@ -1,133 +1,114 @@
 {% extends "base.html" %}
 {% load tailwind_filters %}
 {% block content %}
-{% include "navbar.html" %}
-
-<div class="flex flex-col justify-center items-center">
-
-  <h1 class="text-4xl font-bold m-8">Welcome to the Dashboard, {{ user.username }}</h1>
-
-  <div class="flex items-center justify-around w-full">
-    <div class="float-left">
-
-
-      <p><strong>Hello</strong></p>
-
-      <ul class="text-2xl font-bold">
-        <li>
-          Current Balance : {{ current_balance }}
-        </li>
-        <li>
-          Total Income : {{ total_income }}
-        </li>
-        <li>
-          Total Expense : {{ total_expense }}
-        </li>
-      </ul>
-      <hr>
-
-      <form method="POST">
-
-        {% csrf_token %}
-        {{ filter_form|crispy }}
-        <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" name="filter_submit" type="submit">Submit</button>
-      </form>
-      {{ filter_result }}
-      <h2>Filtered results : </h2>
-
-
-<div class="relative overflow-x-auto table-fixed">
-    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="px-6 py-3 w-16"> <!-- Fixed width 4rem -->
-                    Amount
-                </th>
-                <th scope="col" class="px-6 py-3 w-16"> <!-- Fixed width 4rem -->
-                    Category
-                </th>
-                <th scope="col" class="px-6 py-3 w-16"> <!-- Fixed width 4rem -->
-                    Reason
-                </th>
-                <th scope="col" class="px-6 py-3 w-16"> <!-- Fixed width 4rem -->
-                    Remarks
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for result in filter_result %}
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {{ result.amount }}
-                    </th>
-                    <td class="px-6 py-4">
-                      {{ result.category__name }}
-                    </td>
-                    <td class="px-6 py-4">
-                      {{ result.reason }}
-                    </td>
-                    <td class="px-6 py-4">
-                      {{ result.remarks }}
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4" class="px-6 py-4 text-center">
-                        No data available
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-      <h3>Recent Transactions</h3>
-      <table>
-          <thead>
-              <tr>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Source</th>
-                  <th>Category</th>
-                  <th>Reason</th>
-                  <th>Remarks</th>
-                  <th>Time</th>
-              </tr>
-          </thead>
-          <tbody>
-              {% for transaction in recent_transactions %}
-              <tr>
-                <td>{{ transaction.transaction_type }}</td>
-                <td>{{ transaction.amount }}</td>
-                <td>{{ transaction.source }}</td>
-                <td>{{ transaction.category__name|default:"N/A" }}</td>
-                <td>{{ transaction.reason }}</td>
-                <td>{{ transaction.remarks }}</td>
-                <td>{{ transaction.time }}</td>
-              </tr>
-              {% endfor %}
-          </tbody>
-      </table>
-      </div>
-        <!-- { { filter_result }} -->
-      </div>
-
-      <div class="float-right">
-
-
-        <div class="w-full max-w-2xl mx-8">
-
-          <h3 class="text-2xl">Don't see any category? <a href="{% url "addcategory" %}" class="hover:underline text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add one</a></h3>
-
-          <form action="" method="POST" id="amount_input_form">
-
-            {% csrf_token %}
-            {{ form|crispy }}
-
-            <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" name="tracker_submit" type="submit">Submit</button>
-
-          </form>
+    {% include "navbar.html" %}
+    <div class="flex flex-col justify-center items-center bg-[#F7F7F9]">
+        <h1 class="text-4xl font-bold m-8">Welcome to the Dashboard, {{ user.username }}</h1>
+        <div class="flex items-center justify-around w-full">
+            <div class="float-left">
+                <p>
+                    <strong>Hello</strong>
+                </p>
+                <ul class="text-2xl font-bold">
+                    <li>Current Balance : {{ current_balance }}</li>
+                    <li>Total Income : {{ total_income }}</li>
+                    <li>Total Expense : {{ total_expense }}</li>
+                </ul>
+                <hr>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ filter_form|crispy }}
+                    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                            name="filter_submit"
+                            type="submit">Submit</button>
+                </form>
+                {{ filter_result }}
+                <h2>Filtered results :</h2>
+                <div class="relative overflow-x-auto table-fixed">
+                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 w-16">
+                                    <!-- Fixed width 4rem -->
+                                    Amount
+                                </th>
+                                <th scope="col" class="px-6 py-3 w-16">
+                                    <!-- Fixed width 4rem -->
+                                    Category
+                                </th>
+                                <th scope="col" class="px-6 py-3 w-16">
+                                    <!-- Fixed width 4rem -->
+                                    Reason
+                                </th>
+                                <th scope="col" class="px-6 py-3 w-16">
+                                    <!-- Fixed width 4rem -->
+                                    Remarks
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in filter_result %}
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <th scope="row"
+                                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        {{ result.amount }}
+                                    </th>
+                                    <td class="px-6 py-4">{{ result.category__name }}</td>
+                                    <td class="px-6 py-4">{{ result.reason }}</td>
+                                    <td class="px-6 py-4">{{ result.remarks }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 text-center">No data available</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <h3>Recent Transactions</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Source</th>
+                                <th>Category</th>
+                                <th>Reason</th>
+                                <th>Remarks</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expense_transactions %}
+                                <tr>
+                                    <td>{{ transaction.transaction_type }}</td>
+                                    <td>{{ transaction.amount }}</td>
+                                    <td>{{ transaction.source }}</td>
+                                    <td>{{ transaction.category__name|default:"N/A" }}</td>
+                                    <td>{{ transaction.reason }}</td>
+                                    <td>{{ transaction.remarks }}</td>
+                                    <td>{{ transaction.time }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- { { filter_result }} -->
+            </div>
+            <div class="float-right">
+                <div class="w-full max-w-2xl mx-8">
+                    <h3 class="text-2xl">
+                        Don't see any category? <a href="{% url "addcategory" %}"
+    class="hover:underline text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add one</a>
+                    </h3>
+                    <form action="" method="POST" id="amount_input_form">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                                name="tracker_submit"
+                                type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-
-  {% endblock %}
+{% endblock %}
