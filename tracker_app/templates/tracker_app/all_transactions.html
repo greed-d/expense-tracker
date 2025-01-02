@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load tailwind_filters %}
+
+{% block title %}All Transactions{% endblock %}
+{% block content %}
+{% include "navbar.html" %}
+
+<h3 class="text-3xl font-semibold">All Transactions</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Source</th>
+        <th>Category</th>
+        <th>Reason</th>
+        <th>Remarks</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for transaction in recent_transactions %}
+      <tr>
+        <td>{{ transaction.transaction_type }}</td>
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.source }}</td>
+        <td>{{ transaction.category__name|default:"N/A" }}</td>
+        <td>{{ transaction.reason }}</td>
+        <td>{{ transaction.remarks }}</td>
+        <td>{{ transaction.time }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
