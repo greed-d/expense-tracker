@@ -4,7 +4,7 @@ from django.db import models
 from django.shortcuts import redirect, render
 from django.views.generic.base import View
 
-from tracker_app.forms import InputOrExpense, SourceFilterForm
+from tracker_app.forms import IncomeInputForm, SourceFilterForm
 from tracker_app.models import ExpenseTracker, IncomeTracker
 
 
@@ -17,7 +17,7 @@ class UserLoggedInMixin(View):
 
 class UserDashboardView(UserLoggedInMixin, View):
     template_name = "tracker_app/dashboard.html"
-    form_class = InputOrExpense
+    form_class = IncomeInputForm
     filter_result = None
 
     def get_data(self, user):
@@ -72,18 +72,14 @@ class UserDashboardView(UserLoggedInMixin, View):
         context_data = self.get_data(request.user)
 
         # Get form for filtering
-        filter_form = SourceFilterForm()
 
         context = {
-            "filter_form": filter_form,
-            "form": InputOrExpense(user=request.user),
             **context_data,
         }
 
         return render(request, self.template_name, context)
 
     def post(self, request):
-        context_data = self.get_data(request.user)
         form = self.form_class(request.POST)
         filter_form = SourceFilterForm(request.POST)
 
@@ -92,51 +88,8 @@ class UserDashboardView(UserLoggedInMixin, View):
         print(request.POST)
 
         # breakpoint()
-        if "tracker_submit" in request.POST:
-            if form.is_valid():
-                input_type = form.cleaned_data["input_type"]
-                amount = form.cleaned_data["amount"]
-                source = form.cleaned_data["source"]
-                time = form.cleaned_data["time"]
-                reason = form.cleaned_data["reason"]
-                remarks = form.cleaned_data["remarks"]
-                category = form.cleaned_data["category"]
 
-                print()
-                print("-------------------------")
-                # print(f"Form is : { form }")
-                print(f"Input Type : {input_type}")
-                print(f"Amount : {amount}")
-                print(f"Source : {source}")
-                print(f"Category : {category}")
-                # print(time)
-                print("-------------------------")
-                print()
-
-                if input_type == "IN":
-                    IncomeTracker.objects.create(
-                        user=self.request.user,
-                        amount=amount,
-                        source=source,
-                        time=time,
-                        reason=reason,
-                        remarks=remarks,
-                    )
-
-                elif input_type == "EX":
-                    # category = form.cleaned_data["category"]
-                    ExpenseTracker.objects.create(
-                        user=self.request.user,
-                        amount=amount,
-                        source=source,
-                        time=time,
-                        category=category,
-                        reason=reason,
-                        remarks=remarks,
-                    )
-                return redirect("home")
-
-        elif "filter_submit" in request.POST:
+        if "filter_submit" in request.POST:
             if filter_form.is_valid():
                 search_type = filter_form.cleaned_data["type"]
                 print(search_type)
@@ -169,7 +122,6 @@ class UserDashboardView(UserLoggedInMixin, View):
             "form": self.form_class(user=request.user),
             "filter_form": filter_form,
             "filter_result": filter_result,
-            **context_data,
         }
 
         return render(request, self.template_name, context=context)

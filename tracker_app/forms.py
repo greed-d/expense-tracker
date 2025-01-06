@@ -38,7 +38,7 @@ class DateFilterForm(forms.Form):
         input_formats = ["%Y-%m-%d"]
     )
     source = forms.ChoiceField(
-        choices=(("CA", "Cash"), ("BA", "Bank"), ("WA", "Wallet")),
+        choices=(("Cash", "Cash"), ("Bank", "Bank"), ("Wallet", "Wallet")),
         widget=forms.Select,
         required=True
     )
@@ -57,12 +57,8 @@ class DateFilterForm(forms.Form):
             if start_date > end_date:
                 raise ValidationError("Start date cannot be after end date")
 
-class InputOrExpense(forms.Form):
-    input_type = forms.ChoiceField(
-        choices=(("IN", "Income"), ("EX", "Expense")),
-        widget=forms.Select,
-        required=True
-    )
+class IncomeInputForm(forms.Form):
+    input_type = forms.CharField(widget=forms.HiddenInput, initial = "Income")
     amount = forms.DecimalField(
         max_digits=12, 
         decimal_places=2,
@@ -70,15 +66,9 @@ class InputOrExpense(forms.Form):
         required=True
     )
     source = forms.ChoiceField(
-        choices=(("CA", "Cash"), ("BA", "Bank"), ("WA", "Wallet")),
+        choices=(("Cash", "Cash"), ("Bank", "Bank"), ("Wallet", "Wallet")),
         widget=forms.Select,
         required=True
-    )
-    category = forms.ModelChoiceField(
-        queryset = ExpenseCategory.objects.all(),
-        widget = forms.Select,
-        required=True,
-        empty_label="Select Category",
     )
     time = forms.DateTimeField(
         label = "When?",
@@ -86,7 +76,45 @@ class InputOrExpense(forms.Form):
         input_formats = ["%Y-%m-%dT%H:%M"]
     )
     reason = forms.CharField(
-        max_length=200, 
+        max_length=30, 
+        required=True
+    )
+    remarks = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "placeholder": "Enter remarks (optional)",
+            "rows": 2  
+        }),
+        required=False
+    )
+
+
+class ExpenseInputForm(forms.Form):
+
+    input_type = forms.CharField(widget=forms.HiddenInput, initial = "Expense")
+    amount = forms.DecimalField(
+        max_digits=12, 
+        decimal_places=2,
+        min_value=1,  # Ensure no negative amounts are entered
+        required=True
+    )
+    source = forms.ChoiceField(
+        choices=(("Cash", "Cash"), ("Bank", "Bank"), ("Wallet", "Wallet")),
+        widget=forms.Select,
+        required=True
+    )
+    category = forms.ModelChoiceField(
+        queryset = ExpenseCategory.objects.all(),
+        widget = forms.Select,
+        required=True,
+        empty_label="N/A",
+    )
+    time = forms.DateTimeField(
+        label = "When?",
+        widget = forms.DateTimeInput(attrs={'type' : 'datetime-local'}),
+        input_formats = ["%Y-%m-%dT%H:%M"]
+    )
+    reason = forms.CharField(
+        max_length=30, 
         required=True
     )
     remarks = forms.CharField(
@@ -99,10 +127,11 @@ class InputOrExpense(forms.Form):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
-        super(InputOrExpense, self).__init__(*args, **kwargs)
+        super(ExpenseInputForm, self).__init__(*args, **kwargs)
         print(ExpenseCategory.objects.filter(user=user))
         self.fields["category"].choices = tuple(ExpenseCategory.objects.filter(user=user).values_list("id", "name"))
         print(self.fields["category"].choices)
+
 
 class SourceFilterForm(forms.Form):
     type = forms.ChoiceField(

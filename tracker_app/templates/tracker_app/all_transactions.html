@@ -1,35 +1,84 @@
 {% extends "base.html" %}
 {% load tailwind_filters %}
-
 {% block title %}All Transactions{% endblock %}
 {% block content %}
-{% include "navbar.html" %}
-
-<h3 class="text-3xl font-semibold">All Transactions</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Amount</th>
-        <th>Source</th>
-        <th>Category</th>
-        <th>Reason</th>
-        <th>Remarks</th>
-        <th>Time</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for transaction in recent_transactions %}
-      <tr>
-        <td>{{ transaction.transaction_type }}</td>
-        <td>{{ transaction.amount }}</td>
-        <td>{{ transaction.source }}</td>
-        <td>{{ transaction.category__name|default:"N/A" }}</td>
-        <td>{{ transaction.reason }}</td>
-        <td>{{ transaction.remarks }}</td>
-        <td>{{ transaction.time }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    {% include "navbar.html" %}
+    <div class="flex flex-row justify-between items-center mx-12 ">
+        <div>
+            <h3 class="my-8 mx-6 text-3xl font-semibold">All Transactions</h3>
+        </div>
+        <div class="group">
+            <a href="{% url 'income_table' %}">
+                <button class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 font-medium shadow-md hover:bg-[#6A5BD8] hover:text-white">
+                    Income Table
+                </button>
+            </a>
+            <a href="{% url 'expense_table' %}">
+                <button class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 shadow-md font-medium hover:bg-[#6A5BD8] hover:text-white">
+                    Expense Table
+                </button>
+            </a>
+        </div>
+    </div>
+    <!-- Scrollable table container -->
+    <div class="mt-3 max-h-full mx-16">
+        <table class="w-full table-fixed">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Reason</th>
+                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Source</th>
+                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Amount</th>
+                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Category</th>
+                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Type</th>
+                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Time</th>
+                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Remarks</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white">
+                {% for transaction in page_obj %}
+                    <tr>
+                        <td class="py-4 px-6 border-b border-gray-200">{{ transaction.reason }}</td>
+                        <td class="py-4 px-6 border-b border-gray-200 truncate">{{ transaction.source }}</td>
+                        <td class="py-4 px-6 border-b border-gray-200">{{ transaction.amount }}</td>
+                        <td class="py-4 px-6 border-b border-gray-200">{{ transaction.category__name|default:"N/A" }}</td>
+                        <td class="py-4 px-6 border-b border-gray-200">
+                            {% if transaction.transaction_type == "Income" %}
+                                <span class="bg-green-500 text-white py-3 px-5 rounded-full text-xs">Income</span>
+                            {% elif transaction.transaction_type == "Expense" %}
+                                <span class="bg-red-500 text-white py-3 px-5 rounded-full text-xs">Expense</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-6 border-b border-gray-200">{{ transaction.time }}</td>
+                        <td class="py-4 px-6 border-b border-gray-200">{{ transaction.remarks }}</td>
+                    </tr>
+                {% endfor %}
+                <!-- Add more rows here -->
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        <span class="step-links">
+            <div class="flex flex-row justify-between mx-14 my-6">
+                <div>
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1"
+                           class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 shadow-md font-medium hover:bg-[#6A5BD8] hover:text-white">&laquo; first</a>
+                        <a href="?page={{ page_obj.previous_page_number }}"
+                           class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 shadow-md font-medium hover:bg-[#6A5BD8] hover:text-white">previous</a>
+                    {% endif %}
+                </div>
+                <div>
+                    <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+                </div>
+                <div>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"
+                           class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 shadow-md font-medium hover:bg-[#6A5BD8] hover:text-white">next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}"
+                           class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 shadow-md font-medium hover:bg-[#6A5BD8] hover:text-white">last &raquo;</a>
+                    {% endif %}
+                </div>
+            </div>
+        </span>
+    </div>
 {% endblock %}

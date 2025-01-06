@@ -13,47 +13,29 @@ class DateFilterView(UserLoggedInMixin, View):
     template_name = "tracker_app/date_filter.html"
     form_class = DateFilterForm
 
-    def get_data(self, user):
-
-        income_transactions = IncomeTracker.objects.filter(user=user ).values(
-            'amount', 'source', 'reason', 'category__name', 'remarks', 'time'
-        ).annotate(transaction_type=models.Value('Income', output_field=models.CharField()))
-
-        expense_transactions = ExpenseTracker.objects.filter(user=user).values(
-            'amount', 'source', 'reason', 'category__name', 'remarks', 'time'
-        ).annotate(transaction_type=models.Value('Expense', output_field=models.CharField()))
-
-        # Combine and sort by time
-
-        return {
-            "income_transactions" : income_transactions,
-            "expense_transactions" : expense_transactions
-        }
-    
     def get(self, request):
-        context_data = self.get_data(request.user)
         form = self.form_class
         context = {
             "form" : form,
-            **context_data
         }
         return render(request, self.template_name, context=context)
 
 
     def post(self, request):
-        context_data = self.get_data(request.user)
         form = self.form_class(request.POST)
         results = None
 
         try:
 
             if form.is_valid():
+                print(f"Cleaned Data : {form.cleaned_data}")
                 start_date = form.cleaned_data["start_date"]
                 end_date = form.cleaned_data["end_date"]
                 source = form.cleaned_data["source"]
                 input_type = form.cleaned_data["input_type"]
 
                 filters = Q(user=request.user)
+                print(f"Filters is : {filters}")
 
                 if start_date:
                     filters &= Q(time__gte=start_date)
@@ -62,10 +44,14 @@ class DateFilterView(UserLoggedInMixin, View):
                 if source:
                     filters &= Q(source=source)
 
+                print(f"Final filter {filters}")
+
                 if input_type == "IN":
                     results = IncomeTracker.objects.filter(filters)
                 elif input_type == "EX":
                     results = ExpenseTracker.objects.filter(filters)
+
+                print(results)
             else:
                 form.add_error(None, "Invalid form data, check data again")
 
@@ -73,11 +59,31 @@ class DateFilterView(UserLoggedInMixin, View):
             print(f"An error occured {e}")
             form.add_error(None, "An error occured try again!!")
 
+
         context = {
             "form" : form,
             "results" : results,
-            **context_data
         }
         return render(request, self.template_name, context=context)
 
+class IncomeTableView(View):
+    template_class = "tracker_app/income_table.html"
+
+    def get(self, request):
+        income_transactions = IncomeTracker.objects.filter(user=request.user ).values(
+            'amount', 'source', 'reason', 'category__name', 'remarks', 'time'
+        ).annotate(transaction_type=models.Value('Income', output_field=models.CharField()))
+
+        return render(request, self.template_class, context={ "income_transactions" : income_transactions})
+
+class ExpenseTableView(View):
+    template_class = "tracker_app/expense_table.html"
+
+    def get(self, request):
+
+        expense_transactions = ExpenseTracker.objects.filter(user=request.user).values(
+            'amount', 'source', 'reason', 'category__name', 'remarks', 'time'
+        ).annotate(transaction_type=models.Value('Expense', output_field=models.CharField()))
+
+        return render(request, self.template_class, context= { "expense_transactions" : expense_transactions})
 

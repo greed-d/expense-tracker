@@ -2,9 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 
 INCOME_AT = [("BA", "Bank"), ("WA", "Wallet"), ("CA", "Cash")]
-INCOME_REASON = []
 
-EXPENSE_FROM = [("Bank", "Bank"), ("Wallet", "Wallet"), ("Cash", "Cash")]
+EXPENSE_FROM = [("BA", "Bank"), ("WA", "Wallet"), ("CA", "Cash")]
 
 class ExpenseCategory(models.Model):
     user = models.ForeignKey(User,blank=True, null=True, on_delete=models.CASCADE )

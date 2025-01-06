@@ -1,112 +1,102 @@
 {% extends "base.html" %}
+{% load static %}
 {% load tailwind_filters %}
 {% block content %}
     {% include "navbar.html" %}
-    <div class="flex flex-col justify-center items-center bg-[#F7F7F9]">
-        <h1 class="text-4xl font-bold m-8">Welcome to the Dashboard, {{ user.username }}</h1>
-        <div class="flex items-center justify-around w-full">
-            <div class="float-left">
-                <p>
-                    <strong>Hello</strong>
-                </p>
-                <ul class="text-2xl font-bold">
-                    <li>Current Balance : {{ current_balance }}</li>
-                    <li>Total Income : {{ total_income }}</li>
-                    <li>Total Expense : {{ total_expense }}</li>
-                </ul>
-                <hr>
-                <form method="POST">
-                    {% csrf_token %}
-                    {{ filter_form|crispy }}
-                    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                            name="filter_submit"
-                            type="submit">Submit</button>
-                </form>
-                {{ filter_result }}
-                <h2>Filtered results :</h2>
-                <div class="relative overflow-x-auto table-fixed">
-                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 w-16">
-                                    <!-- Fixed width 4rem -->
-                                    Amount
-                                </th>
-                                <th scope="col" class="px-6 py-3 w-16">
-                                    <!-- Fixed width 4rem -->
-                                    Category
-                                </th>
-                                <th scope="col" class="px-6 py-3 w-16">
-                                    <!-- Fixed width 4rem -->
-                                    Reason
-                                </th>
-                                <th scope="col" class="px-6 py-3 w-16">
-                                    <!-- Fixed width 4rem -->
-                                    Remarks
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for result in filter_result %}
-                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                    <th scope="row"
-                                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        {{ result.amount }}
-                                    </th>
-                                    <td class="px-6 py-4">{{ result.category__name }}</td>
-                                    <td class="px-6 py-4">{{ result.reason }}</td>
-                                    <td class="px-6 py-4">{{ result.remarks }}</td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="4" class="px-6 py-4 text-center">No data available</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <h3>Recent Transactions</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                <th>Source</th>
-                                <th>Category</th>
-                                <th>Reason</th>
-                                <th>Remarks</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for expense in expense_transactions %}
-                                <tr>
-                                    <td>{{ transaction.transaction_type }}</td>
-                                    <td>{{ transaction.amount }}</td>
-                                    <td>{{ transaction.source }}</td>
-                                    <td>{{ transaction.category__name|default:"N/A" }}</td>
-                                    <td>{{ transaction.reason }}</td>
-                                    <td>{{ transaction.remarks }}</td>
-                                    <td>{{ transaction.time }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"></script>
+    <div class="w-full h-full flex flex-col">
+        <div class="mx-16 my-4">
+            <div id="greeting" class = "text-3xl font-medium">Hello, {{ user.username }}</div>
+        </div>
+        <div id="buttons" class="mx-12">
+            <div class="flex justify-between">
+                <div>
+                    <a href="{% url 'date-filter' %}">
+                        <button class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 font-medium shadow-md hover:bg-white-400">
+                            <i class="ph-bold ph-calendar-dots"></i> Date filter
+                        </button>
+                    </a>
+                    <a href="{% url 'date-filter' %}">
+                        <button class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 font-medium shadow-md hover:bg-[#6A5BD8] hover:text-white">
+                            <i class="ph-bold ph-faders-horizontal"></i> Source Filters
+                        </button>
+                    </a>
                 </div>
-                <!-- { { filter_result }} -->
+                <div class="group">
+                    <a href="{% url 'add_income_amount' %}">
+                        <button class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 font-medium shadow-md hover:bg-[#6A5BD8] hover:text-white">
+                            <i class="ph-bold ph-plus"></i> Income
+                        </button>
+                    </a>
+                    <a href="{% url 'add_expense_amount' %}">
+                        <button class="bg-white text-black rounded-xl text-center self-center px-3 py-2 my-2 mx-2 shadow-md font-medium hover:bg-[#6A5BD8] hover:text-white">
+                            <i class="ph-bold ph-minus"></i> Expense
+                        </button>
+                    </a>
+                </div>
             </div>
-            <div class="float-right">
-                <div class="w-full max-w-2xl mx-8">
-                    <h3 class="text-2xl">
-                        Don't see any category? <a href="{% url "addcategory" %}"
-    class="hover:underline text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Add one</a>
-                    </h3>
-                    <form action="" method="POST" id="amount_input_form">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                name="tracker_submit"
-                                type="submit">Submit</button>
-                    </form>
+        </div>
+        <div id="tiles" class="flex justify-between text-center h-40 mx-10 my-6 ">
+            <div id="current_amount"
+                 class="flex bg-[#DDB4FF] rounded-xl basis-1/3 mx-4 flex-col item-center justify-center">
+                <div class="text-xl">Total Balance</div>
+                <div class="text-4xl font-semibold">Rs. {{ current_balance }}</div>
+                <!-- <img src="{ % static 'income_image.png' %}" alt="income"> -->
+            </div>
+            <div id="total_income"
+                 class="flex bg-[#FDB9F4] rounded-xl basis-1/3 flex-col items-center justify-center">
+                <div class="text-xl">Total Income</div>
+                <div class="text-4xl font-semibold">Rs. {{ total_income }}</div>
+            </div>
+            <div id="total_expense"
+                 class="flex bg-red-200 rounded-xl basis-1/3 mx-4 flex-col items-center justify-center">
+                <div class="text-xl">Total Expense</div>
+                <div class="text-4xl font-semibold">Rs. {{ total_expense }}</div>
+            </div>
+        </div>
+        <div class="flex-grow flex flex-row mx-10 mb-10">
+            <div id="chart" class="bg-red-100  basis-1/3 ml-4 mb-16 rounded-lg">Expense Chart</div>
+            <div class="flex flex-col bg-white basis-2/3 mx-4 mb-16 rounded-lg  ">
+                <div class="flex justify-between align-middle text-center my-3 mx-3">
+                    <div class="text-2xl font-semibold">Recent Transactions</div>
+                    <a href="{% url 'transactions' %}">
+                        <button class="bg-white text-black rounded-xl text-center self-center px-3 py-2 shadow-md font-medium hover:bg-[#6A5BD8] hover:text-white">
+                            View All
+                        </button>
+                    </a>
+                </div>
+                <div id="recent_transactions">
+                    <div class="shadow-lg rounded-lg overflow-hidden mx-4 md:mx-3">
+                        <table class="w-full table-fixed mt-3">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Reason</th>
+                                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Source</th>
+                                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">Amount</th>
+                                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">time</th>
+                                    <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">type</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                                {% for transaction in recent_transactions %}
+                                    <tr>
+                                        <td class="py-4 px-6 border-b border-gray-200">{{ transaction.reason }}</td>
+                                        <td class="py-4 px-6 border-b border-gray-200 truncate">{{ transaction.source }}</td>
+                                        <td class="py-4 px-6 border-b border-gray-200">{{ transaction.amount }}</td>
+                                        <td class="py-4 px-6 border-b border-gray-200">{{ transaction.time|date:"M j, Y" }}</td>
+                                        <td class="py-4 px-6 border-b border-gray-200">
+                                            {% if transaction.transaction_type == "Income" %}
+                                                <span class="bg-green-500 text-white py-3 px-5 rounded-full text-xs">Income</span>
+                                            {% elif transaction.transaction_type == "Expense" %}
+                                                <span class="bg-red-500 text-white py-3 px-5 rounded-full text-xs">Expense</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <!-- Add more rows here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

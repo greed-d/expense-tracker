@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.generic.base import View
 
@@ -27,5 +28,10 @@ class AddCategoryView(View):
             category = form.save(commit=False)
             category.user = request.user
             category.save()
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({"success": True, "category_id": category.id, "category_name": category.name})
+
             return redirect("addcategory")
+
         return render(request, self.template_name, {"form" : form})

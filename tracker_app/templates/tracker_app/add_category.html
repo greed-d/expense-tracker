@@ -1,20 +1,48 @@
 {% extends "base.html" %}
 {% block title %}Add Category{% endblock %}
 {% load tailwind_filters %}
-
 {% block content %}
-{% include "navbar.html" %}
+    {% include "navbar.html" %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <!--<button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" name="category_submit" type="submit">Submit</button>-->
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" onclick="closePopup()" class="btn btn-secondary">Close</button>
+    </form>
+    <h3>Your categories:</h3>
+    <ul>
+        {% for category in categories %}<li>{{ category }}</li>{% endfor %}
+    </ul>
+    <script>
+    document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        const formData = new FormData(this);
 
-<form action="" method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" name="category_submit" type="submit">Submit</button>
-</form>
+        fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the category dropdown in the parent form
+                const categorySelect = document.getElementById('id_category'); // Replace with your field ID
+                const newOption = document.createElement('option');
+                newOption.value = data.category_id;
+                newOption.textContent = data.category_name;
+                categorySelect.appendChild(newOption);
 
-<h3>Your categories:</h3>
-<ul>
-  {% for category in categories %}
-  <li> {{ category }}</li>
-  {% endfor %}
-</ul>
+                // Close the popup
+                closePopup();
+            } else {
+                alert('Failed to add category. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    </script>
 {% endblock %}
